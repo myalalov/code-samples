@@ -1,0 +1,55 @@
+<div class="typeahead-container">
+  
+    <input
+        id="typeahead-ads"
+        ng-class="{ 'is-loading': isLoading }"
+        class="styled-input typeahead-input"
+        ng-model="query"
+        placeholder="{{ options.placeholder }}"
+        autocomplete="off"
+        ng-disabled="disabledFilter"
+    >
+    </input>
+
+    <div class="popover-wrapper" ng-if="isOpened" >
+
+        <div class="arrow-up"></div>
+
+        <div class="popover" style="width: 500px">
+            <ul class="typeahead dropdown-menu typeahead-popover-big">
+                <li ng-click="selectAllAds()" class="default-option" tabindex="-1">
+                    {{ '_AllAds_' | i18n }}
+                </li>
+
+                <li ng-repeat="(indexGroup,match) in groups" tabindex="-1" ng-hide="!match.length">
+                    <h4 ng-click="selectGroup( match[ 0 ].campaign )">
+                        {{ match[ 0 ].campaign.name }}
+                        <span ng-if="match[ 0 ].campaign.code">({{ match[ 0 ].campaign.code }})</span>
+                        ({{ match.length }})</h4>
+                    <p
+                        class="group"
+                        ng-repeat="row in match"
+                        ng-click="selectItem( indexGroup, $index )"
+                        ng-hide="$index >= 2 && !showMore"
+                    >
+                        <span class="icons-onDemand icon-videoservice"></span>
+                        <span class="programme-name">{{ row.title }}</span>
+                        <span ng-if="row.hasOwnProperty('publishedDate')"
+                              class="time">
+                            {{ row.publishedDate | dateEpoch }} -
+                            {{ row.validTo | dateEpoch }}
+                        </span>
+                    </p>
+                    <p class="more-link" ng-show="match.length > 2">
+                        <a ng-show="!showMore" ng-click="showMore = !showMore">+ more</a>
+                        <a ng-show="showMore" ng-click="showMore = !showMore">- less</a>
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <span ng-if="isLoading" class="loading">
+    </span>
+
+</div>

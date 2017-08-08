@@ -1,0 +1,147 @@
+.gutter {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.mced-classlib-structures {
+  display: inline-block;
+  padding: 1rem;
+  width: calc(35% - 2rem);
+  vertical-align: top;
+
+  input {
+    margin: 0 0 1rem 0;
+  }
+
+  input[type="checkbox"] + label {
+    top: -16px;
+  }
+
+  .black {
+    color: #000;
+  }
+
+  .gray {
+    color: #aaa;
+  }
+
+  .mcd-classlib-library-title {
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mcd-classlib-tree-child {
+    margin-left: 1.75em;
+    cursor: pointer;
+
+    &.selected {
+      color: #0074D9;
+    }
+
+    &.selected.gray {
+      color: #71abd9;
+    }
+  }
+
+  .mcd-classlib-action-icon {
+    cursor: pointer;
+  }
+}
+
+.mced-classlib-grades {
+  display: inline-block;
+  padding: 1rem;
+  width: calc(65% - 2rem);
+  vertical-align: top;
+
+  .mced-classlib-gradeset-details {
+    padding: 1.5rem 0;
+
+    & > input {
+      width: 50%;
+    }
+
+    input {
+      margin: 0;
+    }
+
+    p-calendar {
+      margin-left: 2rem;
+      display: inline;
+
+      .ui-datepicker .ui-datepicker-title select {
+        padding-top: 0;
+        padding-bottom: 0;
+        height: 1.5rem;
+      }
+    }
+  }
+
+  & /deep/ th.ui-state-default {
+    vertical-align: middle;
+  }
+
+  & /deep/ .ui-datatable .ui-datatable-footer {
+    padding: 0.2em 0.75em;
+
+    a:hover {
+      color: #666;
+      text-decoration: none;
+    }
+
+    .mos-c-button--sm {
+      text-transform: none;
+    }
+  }
+}
+
+.mced-classlib-inline-block {
+  display: flex;
+
+  & > button {
+    display: inline;
+    margin: 0 15px 0 0;
+  }
+
+  & > input {
+    display: inline;
+  }
+}
+
+.mcd-classlib {
+  &-check-message {
+    margin: 1rem 0 1rem 0;
+    color: red;
+  }
+
+  &-success-message {
+    margin: 1rem 0 1rem 0;
+    color: darkgreen;
+  }
+
+  .ui-datatable-tablewrapper {
+    td {
+      vertical-align: middle;
+    }
+
+    input[type=text] {
+      $height: 38px;
+
+      margin: 0;
+      padding: 0 .5em;
+      height: $height;
+      line-height: $height;
+      box-sizing: border-box;
+    }
+  }
+
+  &__names {
+    width: 50%;
+
+    label {
+      width: 95px;
+    }
+  }
+}

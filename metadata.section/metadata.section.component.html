@@ -1,0 +1,28 @@
+<div id="programme-details" class="" *ngIf="info && info.publicId">
+
+  <div class="image-holder">
+      <!-- <img [src]="info.advertiserLogo" (error)="info.advertiserLogo = defaultLogo" /> -->
+      <img [src]="defaultLogo" />
+      <div class="image-overlay"></div>
+  </div>
+
+  <section class="content">
+      <div class="ad-metadata-container">
+          <div class="ad-metadata-detail">{{ '_Advertiser_' | i18n }}:
+              <span>{{ info.advertiser }} ({{ info.advertiserCode }})</span>
+          </div>
+          <div class="ad-metadata-detail">{{ '_Campaign_' | i18n }}:
+              <span>{{ info.name }}</span>
+          </div>
+          <div *ngIf="info.validFrom && info.validTo" class="ad-metadata-detail">{{ '_FlightPeriod_' | i18n }}:
+              <span>{{ info.validFrom}} - {{ info.validTo }}</span>
+          </div>
+      </div>
+      <div class="ad-metadata-container">
+          <div *ngIf="info.agency" class="ad-metadata-detail" >{{ '_AdAgency_' | i18n }}:
+              <span>{{ info.agency }}</span>
+          </div>
+      </div>
+  </section>
+
+</div>

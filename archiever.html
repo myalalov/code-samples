@@ -1,0 +1,455 @@
+<html>
+<head>
+
+	<style type="text/css">
+		.source-data {
+			background-color: #e8dcbb;
+			border: 1px solid #ffa500;
+		}
+
+		.service-data {
+			background-color: #e0e0e0;
+			border: 1px solid #a5a5a5;
+		}
+
+		.packed-data {
+			background-color: #b1e8a8;
+			border: 1px solid #75c079;
+			word-break: break-all;
+		}
+
+		.unpacked-data {
+			background-color: #c8e5e8;
+			border: 1px solid #558bc0;
+		}
+
+		.unpacked-data table {
+			border: none;
+			border-collapse: collapse;
+			border-spacing: 0;
+			margin: 0 auto;
+		}
+
+		.unpacked-data table td {
+			padding: 2px 20px;
+		}
+
+		.unpacked-column {
+			text-align: right;
+		}
+
+		.source-column {
+			text-align: left;
+		}
+
+		.successfull {
+			color: #043e07;
+		}
+
+		.errorneous {
+			color: #fd1e1e;
+		}
+
+		.data-wrapper {
+			position: relative;
+			margin: 20px 5px;
+			padding: 20px;
+			font-family: monospace;
+			overflow: hidden;
+			max-height: 1000px;
+			transition: max-height .5s ease-out;
+			-webkit-transition: max-height .5s ease-out;
+		}
+
+		.data-wrapper.collapsed {
+			max-height: 20px;
+		}
+
+		.data-wrapper h2 {
+			margin: 0 0 20px 0;
+		}
+
+		.data-wrapper ul,
+		.data-wrapper ol {
+			margin: 0;
+		}
+
+		.expand-collapse-link {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			color: black;
+			border-bottom: 1px dotted black;
+			cursor: pointer;
+		}
+	</style>
+
+</head>
+<body>
+
+<h1>Task 1</h1>
+
+<div class="source-data data-wrapper collapsed">
+	<div class="expand-collapse-link">Expand</div>
+	<h2>Source Data</h2>
+	<div id="source-data"></div>
+</div>
+
+<div class="service-data data-wrapper">
+	<div class="expand-collapse-link">Collapse</div>
+	<h2>Service Data</h2>
+	<div id="service-data"></div>
+</div>
+
+<div class="packed-data data-wrapper">
+	<h2>Packed Data</h2>
+	<div id="packed-data"></div>
+</div>
+
+<div class="unpacked-data data-wrapper">
+	<div class="expand-collapse-link">Collapse</div>
+	<h2>Unpacked Data</h2>
+	<div id="unpacked-data"></div>
+</div>
+
+<script type="application/javascript">
+
+	function toggleClass (element, name) {
+		var classes = element.className.split(' '),
+			index = classes.indexOf(name),
+			added = true;
+		if (index >= 0) {
+			classes.splice(index, 1);
+			added = false;
+		} else {
+			classes.push(name);
+
+		}
+		element.className = classes.join(' ');
+		return added;
+	}
+
+	var element = document.getElementsByClassName('expand-collapse-link');
+	for (var ei = 0; ei < element.length; ei++) {
+		element[ei].addEventListener('click', function (event) {
+			if (toggleClass(event.target.parentElement, 'collapsed')) {
+				event.target.innerText = 'Expand';
+			} else {
+				event.target.innerText = 'Collapse';
+			}
+		}, false);
+	}
+
+	var items = [
+		'red/apple/candy/jujube/red',
+		'green/apple/candy',
+		'red/garnet/juice',
+		'green/grapes/candy',
+		'orange/orange/coctail/alcohol',
+		'green/apple/jujube/green',
+		'green/grapes/ice cream',
+		'red/apple/candy',
+		'orange/orange/juice',
+		'orange/orange/pie',
+		'red/strawberry/candy',
+		'red/strawberry/pie',
+		'orange/orange/coctail/non alcohol',
+		'red/apple/puree',
+		'green/grapes/juice',
+		'green/grass/silo',
+		'red/strawberry/juice',
+		'red/apple/candy/jujube/green',
+		'red/garnet/candy/red',
+		'red/grapes/ice cream',
+		'red/garnet/candy/jujube',
+		'red/apple/candy/jujube/blue',
+		'green/apple/jujube/green',
+		'red/strawberry/ice cream',
+		'red/apple/ice cream',
+		'red/garnet/pie',
+		'green/grass/hay',
+		'green/lime/coctail/non alcohol',
+		'red/grapes/juice',
+		'green/lime/coctail/alcohol',
+		'green/lime/tea',
+		'green/apple/puree',
+		'green/lime/mousse',
+		'red/apple/candy/sweet',
+		'green/apple/sweet',
+		'red/grapes/candy'
+	];
+
+	var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',
+		alphabetBitSize = 6;
+
+	function findOrAdd (array, item) {
+		var index = array.indexOf(item);
+		if (index < 0) {
+			index = array.length;
+			array.push(item);
+		}
+		return index;
+	}
+
+	function buildVocabularyAndCodeStrings (list) {
+		var vocabulary = {
+				colors: [],
+				fruits: [],
+				others: []
+			},
+			coded = [],
+			len = list.length,
+			i, j;
+
+		for (i = 0; i < len; i++) {
+			var tokens = list[i].split('/');
+			tokens[0] = findOrAdd(vocabulary.colors, tokens[0]);
+			tokens[1] = findOrAdd(vocabulary.fruits, tokens[1]);
+			for (j = tokens.length - 1; j > 1; j--) {
+				tokens[j] = findOrAdd(vocabulary.others, tokens[j]);
+			}
+			coded.push(tokens);
+		}
+
+		return {
+			vocabulary: vocabulary,
+			coded: coded
+		};
+	}
+
+	function getVocabularyBitSize (vocabulary) {
+		var size = 0,
+			len = (vocabulary.length - 1) || 1;
+		while (len) {
+			len = len >> 1;
+			size++;
+		}
+		return size;
+	}
+
+	var bitStream = {
+		debug: true,
+		current: '',
+		reset: function () {
+			this.current = '';
+		},
+		stringToNumber: function (size, chunk) {
+			var index = 0;
+			for (var i = size - 1, j = 1; i >= 0; i--, j = j << 1) {
+				index += chunk[i] === '0' ? 0 : j;
+			}
+			return index;
+		},
+		set: function (data) {
+			this.reset();
+			for (var i = 0; i < data.length; i++) {
+				this.push(alphabetBitSize, alphabet.indexOf(data[i]));
+			}
+		},
+		push: function (size, data) {
+			var number = '';
+			for (var i = 0; i < size; i++) {
+				number = '' + (data & 1) + number;
+				data = data >> 1;
+			}
+			this.current += number;
+		},
+		shift: function (size) {
+			// if the rest of data is only '0' at first position and several (or zero) trailing '1',
+			// then there is no data more, even if this.current.length is greater than size
+			if (this.current.lastIndexOf('0') === 0) {
+				return -1;
+			}
+			var chunk = this.current.slice(0, size);
+			this.current = this.current.slice(size);
+			return this.stringToNumber(size, chunk);
+		},
+		result: function () {
+			var data = this.current,
+				result = '',
+				chunk;
+
+			// See comment in this.shift() method
+			data += '0';
+			while (data.length) {
+				chunk = data.slice(0, alphabetBitSize);
+				if (chunk.length < alphabetBitSize) {
+					while (chunk.length < alphabetBitSize) {
+						chunk += '1';
+					}
+				}
+				data = data.slice(alphabetBitSize);
+				result += alphabet[this.stringToNumber(alphabetBitSize, chunk)];
+			}
+			return result;
+		}
+	};
+
+	function codeByteStream (codedData) {
+		var vocabulary = codedData.vocabulary,
+			coded = codedData.coded;
+
+		var result = '',
+			len = coded.length,
+			sizes = {},
+			i, j;
+
+		result += vocabulary.colors.join(',') + '|';
+		result += vocabulary.fruits.join(',') + '|';
+		result += vocabulary.others.join(',') + '|';
+
+		sizes.colors = getVocabularyBitSize(vocabulary.colors);
+		sizes.fruits = getVocabularyBitSize(vocabulary.fruits);
+		sizes.others = getVocabularyBitSize(vocabulary.others);
+
+		var content = '';
+		content += '<h4>Vocabularies:</h4><ul>';
+		content += '<li>colors: ' + JSON.stringify(vocabulary.colors) + ' <sup>(will be encoded with ' + sizes.colors + ' bits)</sup></li>';
+		content += '<li>fruits: ' + JSON.stringify(vocabulary.fruits) + ' <sup>(will be encoded with ' + sizes.fruits + ' bits)</sup></li>';
+		content += '<li>others: ' + JSON.stringify(vocabulary.others) + ' <sup>(will be encoded with ' + sizes.others + ' bits)</sup></li>';
+		content += '</ul>';
+		content += '<h4>Data with coded tokens:</h4>';
+		content += JSON.stringify(coded) + '<br/><br/>';
+		content += 'Alphabet for bit encoding: ' + alphabet + ' (every symbol of packed data will encode ' + alphabetBitSize + ' bits)<br/>';
+		addContent('service-data', content);
+
+		bitStream.debug = true;
+		for (i = 0; i < len; i++) {
+			var tokens = coded[i];
+
+			// I think it would be better to separate main tokens from others,
+			// to keep an opportunity to make some statistics or filtering even
+			// through|in coded data
+
+			bitStream.reset();
+			bitStream.push(sizes.colors, tokens[0]);
+			bitStream.push(sizes.fruits, tokens[1]);
+			result += bitStream.result();
+
+			bitStream.reset();
+			for (j = 2; j < tokens.length; j++) {
+				bitStream.push(sizes.others, tokens[j]);
+			}
+			result += bitStream.result();
+
+			result += (i === len - 1) ? '' : ',';
+			bitStream.debug = false;
+		}
+
+		return result;
+	}
+
+	function packIt (list) {
+		// Maybe, in production with its huge data it will be better to implement one-pass encoding
+		// with special sequences about growing vocabulary, etc
+		// But for test task the two-passes encoding will be better, because it's more efficient
+		return codeByteStream(buildVocabularyAndCodeStrings(list));
+	}
+
+	function getTotalBitSize (/* sizes */) {
+		var size = 0;
+		for (var i = 0, l = arguments.length; i < l; i++) {
+			size += arguments[i];
+		}
+		size++;  // Count mandatory trailing zero (see comment in bitStream.shift() method)
+		var rest = (size - 1) % alphabetBitSize + 1;
+		return size + (alphabetBitSize - rest);
+	}
+
+	function unpackIt (data) {
+		var vocabulary = {},
+			sizes = {},
+			coded,
+			result = [],
+			len,
+			decoded,
+			tokens,
+			mainTokensSize,
+			i, j;
+
+		// Sure, in real life here should be reading from stream char by char
+		// because data can be huge
+		decoded = data.split('|');
+		vocabulary.colors = decoded[0].split(',');
+		vocabulary.fruits = decoded[1].split(',');
+		vocabulary.others = decoded[2].split(',');
+		coded = decoded[3].split(',');
+		len = coded.length;
+
+		sizes.colors = getVocabularyBitSize(vocabulary.colors);
+		sizes.fruits = getVocabularyBitSize(vocabulary.fruits);
+		sizes.others = getVocabularyBitSize(vocabulary.others);
+
+		mainTokensSize = Math.round(getTotalBitSize(sizes.colors, sizes.fruits) / alphabetBitSize);
+
+		for (i = 0; i < len; i++) {
+			tokens = [];
+
+			bitStream.set(coded[i].slice(0, mainTokensSize));
+			tokens.push(vocabulary.colors[bitStream.shift(sizes.colors)]);
+			tokens.push(vocabulary.fruits[bitStream.shift(sizes.fruits)]);
+
+			bitStream.set(coded[i].slice(mainTokensSize));
+			j = bitStream.shift(sizes.others);
+			while (j >= 0) {
+				tokens.push(vocabulary.others[j]);
+				j = bitStream.shift(sizes.others);
+				if (tokens.length > 5) {
+					return tokens;
+				}
+			}
+
+			result.push(tokens.join('/'));
+		}
+
+		return result;
+	}
+
+	function addContent (id, content) {
+		var element = document.getElementById(id);
+		element.innerHTML = element.innerHTML + content;
+	}
+
+	addContent('source-data', '<ol><li>' + items.join('</li><li>') + '</li></ol>');
+
+	var packed = packIt(items);
+
+	var sourceLength = items.reduce(function (sum, item) {
+		return sum + item.length + 1;  // let's count some symbol which separates lines, for example \n
+	}, 0);
+
+	var content = '<br/><hr/><br/>';
+	content += 'Length of source data: ' + sourceLength + ' bytes<br/>';
+	content += 'Length of packed string: ' + packed.length + ' bytes<br/><br/>';
+	content += 'Percentage: ' + Math.round(packed.length / sourceLength * 100) + '%' + '<br/><br/>';
+	addContent('service-data', content);
+
+	addContent('packed-data', packed);
+
+	var unpacked = unpackIt(packed);
+
+	var equals = true;
+	if (unpacked.length !== items.length) {
+		equals = false;
+	}
+	for (var i = 0; i < unpacked.length; i++) {
+		if (unpacked[i] !== items[i]) {
+			equals = false;
+		}
+	}
+
+	content = '<table>';
+	var maxlen = Math.max(unpacked.length, items.length);
+	for (i = 0; i < maxlen; i++) {
+		content += '<tr>';
+		content += '<td class="unpacked-column ' + (unpacked[i] === items[i] ? 'successfull' : 'errorneous') + '">' + (unpacked[i] || '') + '</td>';
+		content += '<td class="source-column ' + (unpacked[i] === items[i] ? '' : 'errorneous') + '">' + (items[i] || '') + '</td>';
+		content += '</tr>';
+	}
+	content += '</table>';
+	addContent('unpacked-data', content);
+
+</script>
+
+</body>
+</html>
