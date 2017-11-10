@@ -7,20 +7,16 @@ function func(...args) {
 }
 
 Function.prototype.mybind = function(object, ...args) {
-    const settings = {
-        object,
-        callback: this,
-        arguments: [...args]
-    };
+    const callback = this;
 
-    const bindedFunc = function(...local) {
-        return settings.callback.apply(settings.object, [...settings.arguments, ...local]);
+    const bindedFunc = (...local) => {
+        return callback.apply(object, [...args, ...local]);
     };
 
     const updatedPrototype = function() {
-        this.mybind = function(newObject, ...newArgs) {
-            settings.object = newObject;
-            settings.arguments.push(...newArgs);
+        this.mybind = (newObject, ...newArgs) => {
+            object = newObject;
+            args.push(...newArgs);
             return bindedFunc;
         };
     };
